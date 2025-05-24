@@ -1,10 +1,18 @@
-﻿namespace CLI
+﻿using CLI.Commands;
+
+namespace CLI
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            var commands = new List<IGitCommand>
+{
+                new InitCommand()
+            };
+
+            var runner = new CommandRunner(commands);
+            await runner.RunAsync(args);
         }
     }
 }
