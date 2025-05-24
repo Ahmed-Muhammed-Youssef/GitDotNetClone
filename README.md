@@ -4,7 +4,7 @@
 
 ## 🚀 Features (In Progress)
 
-- [ ] `init` – Initialize a new repository (`.git` directory)
+- [x] `init` – Initialize a new repository (`.git` directory)
 - [ ] `add` – Track changes to files by hashing and storing them
 - [ ] `commit` – Save a snapshot of the staged changes
 - [ ] `status` – Show current repository state
