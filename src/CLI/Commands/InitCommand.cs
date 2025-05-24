@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CLI.Commands
+﻿namespace CLI.Commands
 {
     public class InitCommand : IGitCommand
     {
@@ -13,7 +7,14 @@ namespace CLI.Commands
         public async Task ExecuteAsync(string[] args)
         {
             // Your .git directory setup logic here
-            Console.WriteLine("Initialized empty Git repository.");
+            if (Directory.Exists(".git"))
+            {
+                Console.WriteLine("A Git repository already exists in this directory.");
+                return;
+            }
+
+            Directory.CreateDirectory(".git");
+            // You can add more initialization logic here, such as creating default files like HEAD, config, etc.
             await Task.CompletedTask;
         }
     }
