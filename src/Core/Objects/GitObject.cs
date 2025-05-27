@@ -14,6 +14,29 @@ namespace Core.Objects
             return headerBytes.Concat(Content).ToArray();
         }
 
+        public static GitObject Deserialize(byte[] source)
+        {
+            int nullIndex = Array.IndexOf(source, (byte)0);
+            if (nullIndex == -1)
+                throw new FormatException("Invalid Git object format.");
+
+            string header = Encoding.UTF8.GetString(source, 0, nullIndex);
+            byte[] content = source[(nullIndex + 1)..];
+
+            string[] parts = header.Split(' ');
+            if (parts.Length != 2)
+                throw new FormatException("Invalid Git object header format.");
+
+            string type = parts[0];
+
+            return type switch
+            {
+                "blob" => new BlobGitObject(content),
+                "tree" => new TreeGitObject(content),
+                _ => throw new NotSupportedException($"Unsupported type: {type}")
+            };
+        }
+
         public string GetHash()
         {
             var serialized = Serialize();
