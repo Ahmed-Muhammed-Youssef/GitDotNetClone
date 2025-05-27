@@ -6,15 +6,24 @@
 
         public async Task ExecuteAsync(string[] args)
         {
-            // Your .git directory setup logic here
-            if (Directory.Exists(".git"))
+            const string gitDir = ".git";
+            var objectsDir = Path.Combine(gitDir, "objects");
+            var infoDir = Path.Combine(objectsDir, "info");
+            var packDir = Path.Combine(objectsDir, "pack");
+
+            if (Directory.Exists(gitDir))
             {
                 Console.WriteLine("A Git repository already exists in this directory.");
                 return;
             }
 
-            Directory.CreateDirectory(".git");
-            // You can add more initialization logic here, such as creating default files like HEAD, config, etc.
+            Directory.CreateDirectory(gitDir);
+            Directory.CreateDirectory(objectsDir);
+            Directory.CreateDirectory(infoDir);
+            Directory.CreateDirectory(packDir);
+
+            Console.WriteLine("Initialized empty git repository.");
+
             await Task.CompletedTask;
         }
     }
