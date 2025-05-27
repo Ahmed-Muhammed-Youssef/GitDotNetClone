@@ -8,7 +8,8 @@ namespace CLI
         {
             var commands = new List<IGitCommand>
 {
-                new InitCommand()
+                new InitCommand(),
+                new AddCommand()
             };
 
             var runner = new CommandRunner(commands);
