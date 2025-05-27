@@ -7,9 +7,9 @@ namespace Core.Stores
     /// Manages the Git index file (.git/index), which acts as the staging area
     /// in a minimal Git implementation.
     /// </summary>
-    public class IndexStore
+    public class IndexStore(string root)
     {
-        private const string _indexFilePath = ".git/index";
+        private readonly string _indexFilePath = Path.Combine(root, ".git", "index");
         private List<IndexEntry> _entries = [];
 
         /// <summary>
