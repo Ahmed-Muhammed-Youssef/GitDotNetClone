@@ -1,4 +1,5 @@
 ﻿using Core.Index;
+using Core.Stores.Interfaces;
 using System.Text.Json;
 
 namespace Core.Stores
@@ -7,7 +8,7 @@ namespace Core.Stores
     /// Manages the Git index file (.git/index), which acts as the staging area
     /// in a minimal Git implementation.
     /// </summary>
-    public class IndexStore(string root)
+    public class IndexStore(string root) : IIndexStore
     {
         private readonly string _indexFilePath = Path.Combine(root, ".git", "index");
         private List<IndexEntry> _entries = [];
@@ -15,7 +16,7 @@ namespace Core.Stores
         /// <summary>
         /// Gets a read-only list of the current entries in the index.
         /// </summary>
-        public IReadOnlyList<IndexEntry> Entries => _entries;
+        public IReadOnlyList<IndexEntry> GetEntries() =>  _entries;
 
         /// <summary>
         /// Loads the index entries from the .git/index file.
