@@ -21,18 +21,37 @@ namespace Core.Stores
         public IReadOnlyList<IndexEntry> GetEntries() =>  _entries;
 
         /// <summary>
+        /// Adds all files from the specified directory and its subdirectories to the Git index.
+        /// Each file is processed as a blob and stored with its relative path.
+        /// </summary>
+        /// <param name="directoryPath">The absolute path to the directory to add files from.</param>
+        /// <remarks>
+        /// This method recursively enumerates all files inside the directory. Hidden files, system files,
+        /// or files within the `.git` directory are not excluded by default — that should be handled externally
+        /// or in a future enhancement.
+        ///
+        /// Throws exceptions if any file is unreadable or if there is an I/O error.
+        /// </remarks>
+        public void AddDirectory(string directoryPath)
+        {
+            foreach (var file in Directory.EnumerateFiles(directoryPath, "*", SearchOption.AllDirectories))
+            {
+                AddFile(file);
+            }
+        }
+
+        /// <summary>
         /// Adds a file to the index by creating a blob object from the file content,
         /// computing its relative normalized path, and storing an index entry.
         /// </summary>
         /// <param name="absolutePath">The absolute path to the file to be added.</param>
-        /// <remarks>
-        /// - The file at <paramref name="absolutePath"/> must exist and be accessible.
-        /// - If the file does not exist or is not accessible, an exception will be thrown.
-        /// - This method assumes the path is valid and belongs to the Git working directory.
-        /// - It is the caller's responsibility to validate the file existence before calling this method.
-        /// </remarks>
         public void AddFile(string absolutePath)
         {
+            if (!File.Exists(absolutePath))
+            {
+                Console.WriteLine($"Warning: File not found, skipping: {absolutePath}");
+                return;
+            }
             BlobGitObject blob = new(File.ReadAllBytes(absolutePath));
 
             var realtivePath = Path.GetRelativePath(root, absolutePath);
@@ -43,6 +62,7 @@ namespace Core.Stores
 
             AddOrUpdate(entry);
         }
+
         /// <summary>
         /// Loads the index entries from the .git/index file.
         /// If the file does not exist, the index remains empty.

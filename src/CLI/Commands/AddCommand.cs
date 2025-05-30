@@ -20,21 +20,23 @@ namespace CLI.Commands
         /// <returns>A task that represents the asynchronous operation.</returns>
         public Task ExecuteAsync()
         {
-            // TODO: Implement support for "git add ." to add all changes recursively
             if (args[0] == ".")
             {
-                throw new NotImplementedException("Adding all files is not implemented yet.");
+                _indexStore.AddDirectory(Directory.GetCurrentDirectory());
             }
-
-            string absolutePath = Path.Combine(Directory.GetCurrentDirectory(), args[0]);
-
-            // TODO: If the provided path is a directory, enumerate and add all contained files recursively
-            if (Directory.Exists(absolutePath))
+            else
             {
-                throw new NotImplementedException("Adding a directory is not implemented yet.");
-            }
+                string absolutePath = Path.Combine(Directory.GetCurrentDirectory(), args[0]);
 
-            _indexStore.AddFile(absolutePath);
+                if (Directory.Exists(absolutePath))
+                {
+                    _indexStore.AddDirectory(absolutePath);
+                }
+                else
+                {
+                    _indexStore.AddFile(absolutePath);
+                }
+            }
 
             _indexStore.Save();
 
