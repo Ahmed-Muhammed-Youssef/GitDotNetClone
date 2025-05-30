@@ -10,7 +10,7 @@ namespace Core.Stores
     /// Manages the Git index file (.git/index), which acts as the staging area
     /// in a minimal Git implementation.
     /// </summary>
-    public class IndexStore(string root) : IIndexStore
+    public class IndexStore(string root, JsonSerializerOptions jsonSerializerOptions) : IIndexStore
     {
         private readonly string _indexFilePath = Path.Combine(root, ".git", "index");
         private List<IndexEntry> _entries = [];
@@ -81,10 +81,7 @@ namespace Core.Stores
         /// </summary>
         public void Save()
         {
-            string json = JsonSerializer.Serialize(_entries, options: new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            string json = JsonSerializer.Serialize(_entries, jsonSerializerOptions);
             File.WriteAllText(_indexFilePath, json);
         }
 

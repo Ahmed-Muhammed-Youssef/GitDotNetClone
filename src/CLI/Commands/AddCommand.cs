@@ -1,6 +1,6 @@
 ﻿using CLI.Services;
-using Core.Services;
 using Core.Stores;
+using System.Text.Json;
 
 namespace CLI.Commands
 {
@@ -59,7 +59,12 @@ namespace CLI.Commands
                 return null;
             }
 
-            IndexStore indexStore = new(root);
+            JsonSerializerOptions jsonOptions = new()
+            {
+                WriteIndented = true
+            };
+
+            IndexStore indexStore = new(root, jsonOptions);
             return new AddCommand(indexStore, args);
         }
     }
