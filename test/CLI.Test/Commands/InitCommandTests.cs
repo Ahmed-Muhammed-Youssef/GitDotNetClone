@@ -17,7 +17,7 @@ namespace CLI.Test.Commands
                 Directory.SetCurrentDirectory(repoPath);
 
                 // Act
-                await command.ExecuteAsync(Array.Empty<string>());
+                await command.ExecuteAsync();
 
                 // Assert
                 Assert.True(Directory.Exists(Path.Combine(repoPath, ".git")));

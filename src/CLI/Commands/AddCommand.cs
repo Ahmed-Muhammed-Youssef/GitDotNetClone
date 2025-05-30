@@ -4,10 +4,10 @@ using Core.Stores;
 
 namespace CLI.Commands
 {
-    public class AddCommand(IGitContextProvider gitContextProvider, IndexStore indexStore) : IGitCommand
+    public class AddCommand(IndexStore indexStore, string[] args) : IGitCommand
     {
-        private readonly IGitContextProvider _gitContextProvider = gitContextProvider;
         private readonly IndexStore _indexStore = indexStore;
+        private readonly string[] args = args;
 
         public static string Name => "add";
 
@@ -18,13 +18,8 @@ namespace CLI.Commands
         /// </summary>
         /// <param name="args">An array of command-line arguments. Expects one argument: the path to the file.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public Task ExecuteAsync(string[] args)
+        public Task ExecuteAsync()
         {
-            if (args.Length != 1)
-            {
-                Console.WriteLine("Usage: git add <file>");
-            }
-
             // TODO: Implement support for "git add ." to add all changes recursively
             if (args[0] == ".")
             {
@@ -46,8 +41,14 @@ namespace CLI.Commands
             return Task.CompletedTask;
         }
 
-        public static IGitCommand? Create()
+        public static IGitCommand? Create(string[] args)
         {
+            if (args.Length != 1)
+            {
+                Console.WriteLine("Usage: git add <file>");
+                return null;
+            }
+
             GitContextProvider _gitContextProvider = new();
 
             if (_gitContextProvider.TryGetRepositoryRoot(out string root))
@@ -57,7 +58,7 @@ namespace CLI.Commands
             }
 
             IndexStore indexStore = new(root);
-            return new AddCommand(_gitContextProvider, indexStore);
+            return new AddCommand(indexStore, args);
         }
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IGitCommand
     {
-        Task ExecuteAsync(string[] args);
+        Task ExecuteAsync();
     }
 }

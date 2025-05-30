@@ -2,7 +2,7 @@
 
 namespace CLI
 {
-    public class CommandRunner(Dictionary<string, Func<IGitCommand?>> commandsFactoriesDictionary)
+    public class CommandRunner(Dictionary<string, Func<string[], IGitCommand?>> commandsFactoriesDictionary)
     {
         public async Task RunAsync(string[] args)
         {
@@ -16,14 +16,14 @@ namespace CLI
             if (commandsFactoriesDictionary.TryGetValue(commandName, out var commandFactory))
             {
 
-                IGitCommand? command = commandFactory.Invoke();
+                IGitCommand? command = commandFactory.Invoke(args.Skip(1).ToArray());
 
                 if(command is null)
                 {
                     return;
                 }
                 
-                await command.ExecuteAsync(args.Skip(1).ToArray());
+                await command.ExecuteAsync();
             }
             else
             {

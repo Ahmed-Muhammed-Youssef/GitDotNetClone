@@ -7,7 +7,7 @@ namespace CLI
     {
         static async Task Main(string[] args)
         {
-            var commandFactoriesDictionary = new Dictionary<string, Func<IGitCommand?>>
+            var commandFactoriesDictionary = new Dictionary<string, Func<string[], IGitCommand?>>
             {
                 { InitCommand.Name, InitCommand.Create },
                 { AddCommand.Name, AddCommand.Create }
