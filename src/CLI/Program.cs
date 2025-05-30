@@ -1,4 +1,5 @@
 ﻿using CLI.Commands;
+using CLI.Services;
 
 namespace CLI
 {
@@ -9,7 +10,7 @@ namespace CLI
             var commands = new List<IGitCommand>
 {
                 new InitCommand(),
-                new AddCommand()
+                new AddCommand(new GitContextProvider())
             };
 
             var runner = new CommandRunner(commands);

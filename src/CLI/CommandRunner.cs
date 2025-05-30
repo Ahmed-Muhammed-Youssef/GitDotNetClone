@@ -2,13 +2,10 @@
 
 namespace CLI
 {
-    public class CommandRunner
+    public class CommandRunner(IEnumerable<IGitCommand> commands)
     {
-        private readonly Dictionary<string, IGitCommand> _commands = [];
-        public CommandRunner(IEnumerable<IGitCommand> commands)
-        {
-            _commands = commands.ToDictionary(cmd => cmd.Name);
-        }
+        private readonly Dictionary<string, IGitCommand> _commands = commands.ToDictionary(cmd => cmd.Name);
+
         public async Task RunAsync(string[] args)
         {
             if (args.Length == 0)

@@ -1,12 +1,13 @@
-﻿using Core.Index;
-using Core.Objects;
+﻿using CLI.Services;
+using Core.Services;
 using Core.Stores;
-using Infrastructure.FileSystem;
 
 namespace CLI.Commands
 {
-    public class AddCommand : IGitCommand
+    public class AddCommand(IGitContextProvider gitContextProvider) : IGitCommand
     {
+        private readonly IGitContextProvider _gitContextProvider = gitContextProvider;
+
         public string Name => "add";
 
         /// <summary>
@@ -24,9 +25,7 @@ namespace CLI.Commands
                 return Task.CompletedTask;
             }
 
-            string? root = PathHelper.GetRepositoryRoot(Directory.GetCurrentDirectory());
-
-            if(root == null)
+            if (_gitContextProvider.TryGetRepositoryRoot(out string root))
             {
                 Console.WriteLine("Error: Not a git repository (or any of the parent directories).");
                 return Task.CompletedTask;
@@ -46,23 +45,13 @@ namespace CLI.Commands
                 throw new NotImplementedException("Adding a directory is not implemented yet.");
             }
 
-
-            BlobGitObject blob = new(File.ReadAllBytes(absolutePath));
-
-            var realtivePath = Path.GetRelativePath(root, absolutePath);
-
-            realtivePath = PathHelper.Normalize(realtivePath);
-
-            IndexEntry entry = new(realtivePath, blob.GetHash(), blob.Content.LongLength);
-
-
             IndexStore indexStore = new(root);
 
-            indexStore.AddOrUpdate(entry);
+            indexStore.AddFile(absolutePath);
 
             indexStore.Save();
 
-            return Task.CompletedTask; 
+            return Task.CompletedTask;
         }
     }
 }

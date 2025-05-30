@@ -1,5 +1,7 @@
 ﻿using Core.Index;
+using Core.Objects;
 using Core.Stores.Interfaces;
+using CrossCuttingConcerns.Helpers;
 using System.Text.Json;
 
 namespace Core.Stores
@@ -18,6 +20,29 @@ namespace Core.Stores
         /// </summary>
         public IReadOnlyList<IndexEntry> GetEntries() =>  _entries;
 
+        /// <summary>
+        /// Adds a file to the index by creating a blob object from the file content,
+        /// computing its relative normalized path, and storing an index entry.
+        /// </summary>
+        /// <param name="absolutePath">The absolute path to the file to be added.</param>
+        /// <remarks>
+        /// - The file at <paramref name="absolutePath"/> must exist and be accessible.
+        /// - If the file does not exist or is not accessible, an exception will be thrown.
+        /// - This method assumes the path is valid and belongs to the Git working directory.
+        /// - It is the caller's responsibility to validate the file existence before calling this method.
+        /// </remarks>
+        public void AddFile(string absolutePath)
+        {
+            BlobGitObject blob = new(File.ReadAllBytes(absolutePath));
+
+            var realtivePath = Path.GetRelativePath(root, absolutePath);
+
+            realtivePath = PathHelper.Normalize(realtivePath);
+
+            IndexEntry entry = new(realtivePath, blob.GetHash(), blob.Content.LongLength);
+
+            AddOrUpdate(entry);
+        }
         /// <summary>
         /// Loads the index entries from the .git/index file.
         /// If the file does not exist, the index remains empty.
@@ -47,7 +72,7 @@ namespace Core.Stores
         /// Adds a new entry or updates an existing one if the file path already exists in the index.
         /// </summary>
         /// <param name="entry">The index entry to add or update.</param>
-        public void AddOrUpdate(IndexEntry entry)
+        private void AddOrUpdate(IndexEntry entry)
         {
             var existing = _entries.FirstOrDefault(e => e.FilePath == entry.FilePath);
             if (existing != null)

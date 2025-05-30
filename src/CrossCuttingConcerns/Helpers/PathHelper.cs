@@ -1,10 +1,10 @@
-﻿namespace Infrastructure.FileSystem
+﻿namespace CrossCuttingConcerns.Helpers
 {
     /// <summary>
     /// Provides utilities for locating the root of a Git repository by searching upward
     /// from a given directory until a `.git` directory is found.
     /// </summary>
-    public static class PathHelper
+    public class PathHelper
     {
         /// <summary>
         /// Converts all directory separators to '/' for cross-platform consistency.
