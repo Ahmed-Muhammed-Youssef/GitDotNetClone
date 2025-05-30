@@ -18,7 +18,7 @@ namespace Core.Stores
         /// <summary>
         /// Gets a read-only list of the current entries in the index.
         /// </summary>
-        public IReadOnlyList<IndexEntry> GetEntries() =>  _entries;
+        public IReadOnlyList<IndexEntry> GetEntries() => _entries;
 
         /// <summary>
         /// Adds all files from the specified directory and its subdirectories to the Git index.
@@ -96,6 +96,33 @@ namespace Core.Stores
                 _entries.Remove(existing);
 
             _entries.Add(entry);
+        }
+
+        /// <summary>
+        /// Gets untracked files, files that doesn't exist in the entries of the index.
+        /// </summary>
+        /// 
+        public List<string> GetUntrackedFiles()
+        {
+            var trackedPaths = new HashSet<string>(GetEntries().Select(e => PathHelper.Denormalize(e.FilePath)));
+
+            var allFiles = Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
+                .Where(path => !path.StartsWith(Path.Combine(root, ".git")))
+                .ToList();
+
+            var untracked = new List<string>();
+
+            foreach (var absolutePath in allFiles)
+            {
+                var relativePath = PathHelper.Normalize(Path.GetRelativePath(root, absolutePath));
+
+                if (!trackedPaths.Contains(relativePath))
+                {
+                    untracked.Add(relativePath);
+                }
+            }
+
+            return untracked;
         }
     }
 }
