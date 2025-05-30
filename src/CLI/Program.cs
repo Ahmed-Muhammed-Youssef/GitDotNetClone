@@ -10,7 +10,8 @@ namespace CLI
             var commandFactoriesDictionary = new Dictionary<string, Func<string[], IGitCommand?>>
             {
                 { InitCommand.Name, InitCommand.Create },
-                { AddCommand.Name, AddCommand.Create }
+                { AddCommand.Name, AddCommand.Create },
+                { StatusCommand.Name, StatusCommand.Create }
             };
 
             var runner = new CommandRunner(commandFactoriesDictionary);
