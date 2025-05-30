@@ -8,6 +8,12 @@
         private static readonly string _infoDir = Path.Combine(_objectsDir, "info");
         private static readonly string _packDir = Path.Combine(_objectsDir, "pack");
 
+        /// <summary>
+        /// Executes the initialization of a new Git repository by creating the required directory structure.
+        /// This includes the .git directory and its subdirectories: objects, objects/info, and objects/pack.
+        /// If the directories already exist, no exception is thrown.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ExecuteAsync()
         {
             Directory.CreateDirectory(_gitDir);
@@ -19,6 +25,14 @@
 
             await Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="InitCommand"/> if the arguments are valid and no Git repository exists.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
+        /// <returns>
+        /// An instance of <see cref="IGitCommand"/> if the command can be created; otherwise, <c>null</c>.
+        /// </returns>
         public static IGitCommand? Create(string[] args)
         {
             if (args.Length > 1)

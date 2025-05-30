@@ -13,10 +13,9 @@ namespace CLI.Commands
 
         /// <summary>
         /// Handles the execution of the 'git add' command.
-        /// This method supports adding a single file to the index by computing its hash, storing the blob,
+        /// This method supports adding a single file or multiple files to the index by computing its/their hash, storing the blob,
         /// and updating the index accordingly.
         /// </summary>
-        /// <param name="args">An array of command-line arguments. Expects one argument: the path to the file.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
         public Task ExecuteAsync()
         {
@@ -43,6 +42,15 @@ namespace CLI.Commands
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="AddCommand"/> if the provided arguments are valid and the current directory is a Git repository.
+        /// Validates the argument count, checks for a valid Git repository root, and initializes the <see cref="IndexStore"/> with appropriate JSON options.
+        /// If the arguments are invalid or the repository root is not found, displays an error message and returns null.
+        /// </summary>
+        /// <param name="args">The command-line arguments passed to the 'git add' command. Expects a single file or directory argument.</param>
+        /// <returns>
+        /// An instance of <see cref="IGitCommand"/> representing the add command, or null if the arguments are invalid or not in a Git repository.
+        /// </returns>
         public static IGitCommand? Create(string[] args)
         {
             if (args.Length != 1)
