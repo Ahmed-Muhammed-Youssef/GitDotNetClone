@@ -61,7 +61,7 @@ namespace CLI.Commands
 
             GitContextProvider _gitContextProvider = new();
 
-            if (_gitContextProvider.TryGetRepositoryRoot(out string root))
+            if (!_gitContextProvider.TryGetRepositoryRoot(out string root))
             {
                 Console.WriteLine("Error: Not a git repository (or any of the parent directories).");
                 return null;
