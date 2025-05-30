@@ -4,11 +4,12 @@ using Core.Stores;
 
 namespace CLI.Commands
 {
-    public class AddCommand(IGitContextProvider gitContextProvider) : IGitCommand
+    public class AddCommand(IGitContextProvider gitContextProvider, IndexStore indexStore) : IGitCommand
     {
         private readonly IGitContextProvider _gitContextProvider = gitContextProvider;
+        private readonly IndexStore _indexStore = indexStore;
 
-        public string Name => "add";
+        public static string Name => "add";
 
         /// <summary>
         /// Handles the execution of the 'git add' command.
@@ -22,13 +23,6 @@ namespace CLI.Commands
             if (args.Length != 1)
             {
                 Console.WriteLine("Usage: git add <file>");
-                return Task.CompletedTask;
-            }
-
-            if (_gitContextProvider.TryGetRepositoryRoot(out string root))
-            {
-                Console.WriteLine("Error: Not a git repository (or any of the parent directories).");
-                return Task.CompletedTask;
             }
 
             // TODO: Implement support for "git add ." to add all changes recursively
@@ -45,13 +39,25 @@ namespace CLI.Commands
                 throw new NotImplementedException("Adding a directory is not implemented yet.");
             }
 
-            IndexStore indexStore = new(root);
+            _indexStore.AddFile(absolutePath);
 
-            indexStore.AddFile(absolutePath);
-
-            indexStore.Save();
+            _indexStore.Save();
 
             return Task.CompletedTask;
+        }
+
+        public static IGitCommand? Create()
+        {
+            GitContextProvider _gitContextProvider = new();
+
+            if (_gitContextProvider.TryGetRepositoryRoot(out string root))
+            {
+                Console.WriteLine("Error: Not a git repository (or any of the parent directories).");
+                return null;
+            }
+
+            IndexStore indexStore = new(root);
+            return new AddCommand(_gitContextProvider, indexStore);
         }
     }
 }

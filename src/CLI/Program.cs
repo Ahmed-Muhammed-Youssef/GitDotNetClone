@@ -7,13 +7,13 @@ namespace CLI
     {
         static async Task Main(string[] args)
         {
-            var commands = new List<IGitCommand>
-{
-                new InitCommand(),
-                new AddCommand(new GitContextProvider())
+            var commandFactoriesDictionary = new Dictionary<string, Func<IGitCommand?>>
+            {
+                { InitCommand.Name, InitCommand.Create },
+                { AddCommand.Name, AddCommand.Create }
             };
 
-            var runner = new CommandRunner(commands);
+            var runner = new CommandRunner(commandFactoriesDictionary);
             await runner.RunAsync(args);
         }
     }

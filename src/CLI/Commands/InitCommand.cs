@@ -2,29 +2,31 @@
 {
     public class InitCommand : IGitCommand
     {
-        public string Name => "init";
+        public static string Name => "init";
+        private static readonly string _gitDir = ".git";
+        private static readonly string _objectsDir = Path.Combine(_gitDir, "objects");
+        private static readonly string _infoDir = Path.Combine(_objectsDir, "info");
+        private static readonly string _packDir = Path.Combine(_objectsDir, "pack");
 
         public async Task ExecuteAsync(string[] args)
         {
-            const string gitDir = ".git";
-            var objectsDir = Path.Combine(gitDir, "objects");
-            var infoDir = Path.Combine(objectsDir, "info");
-            var packDir = Path.Combine(objectsDir, "pack");
-
-            if (Directory.Exists(gitDir))
-            {
-                Console.WriteLine("A Git repository already exists in this directory.");
-                return;
-            }
-
-            Directory.CreateDirectory(gitDir);
-            Directory.CreateDirectory(objectsDir);
-            Directory.CreateDirectory(infoDir);
-            Directory.CreateDirectory(packDir);
+            Directory.CreateDirectory(_gitDir);
+            Directory.CreateDirectory(_objectsDir);
+            Directory.CreateDirectory(_infoDir);
+            Directory.CreateDirectory(_packDir);
 
             Console.WriteLine("Initialized empty git repository.");
 
             await Task.CompletedTask;
+        }
+        public static IGitCommand? Create()
+        {
+            if (Directory.Exists(_gitDir))
+            {
+                Console.WriteLine("A Git repository already exists in this directory.");
+                return null;
+            }
+            return new InitCommand();
         }
     }
 }

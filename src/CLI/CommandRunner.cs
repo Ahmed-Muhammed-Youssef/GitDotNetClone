@@ -2,10 +2,8 @@
 
 namespace CLI
 {
-    public class CommandRunner(IEnumerable<IGitCommand> commands)
+    public class CommandRunner(Dictionary<string, Func<IGitCommand?>> commandsFactoriesDictionary)
     {
-        private readonly Dictionary<string, IGitCommand> _commands = commands.ToDictionary(cmd => cmd.Name);
-
         public async Task RunAsync(string[] args)
         {
             if (args.Length == 0)
@@ -13,9 +11,18 @@ namespace CLI
                 Console.WriteLine("No command provided. Use 'git help' for a list of commands.");
                 return;
             }
-            var commandName = args[0];
-            if (_commands.TryGetValue(commandName, out var command))
+            string commandName = args[0];
+
+            if (commandsFactoriesDictionary.TryGetValue(commandName, out var commandFactory))
             {
+
+                IGitCommand? command = commandFactory.Invoke();
+
+                if(command is null)
+                {
+                    return;
+                }
+                
                 await command.ExecuteAsync(args.Skip(1).ToArray());
             }
             else
