@@ -33,6 +33,7 @@ namespace Core.Objects
             {
                 "blob" => new BlobGitObject(content),
                 "tree" => new TreeGitObject(content),
+                "commit" => new CommitGitObject(content),
                 _ => throw new NotSupportedException($"Unsupported type: {type}")
             };
         }

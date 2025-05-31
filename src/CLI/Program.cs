@@ -11,6 +11,7 @@ namespace CLI
             {
                 { InitCommand.Name, InitCommand.Create },
                 { AddCommand.Name, AddCommand.Create },
+                { CommitCommand.Name, CommitCommand.Create },
                 { StatusCommand.Name, StatusCommand.Create }
             };
 
