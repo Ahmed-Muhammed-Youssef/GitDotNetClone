@@ -23,7 +23,7 @@ namespace Core.Stores
 
             byte[] data = File.ReadAllBytes(filePath);
 
-            return GitObject.Deserialize(data);
+            return GitObject.RemoveHeader(data);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Core.Stores
         public static void Save(GitObject obj)
         {
             string hash = obj.GetHash();
-            byte[] content = obj.Serialize();
+            byte[] content = obj.AddHeader();
             string dir = Path.Combine(".git", "objects", hash[..2]);
             string file = Path.Combine(dir, hash[2..]);
 

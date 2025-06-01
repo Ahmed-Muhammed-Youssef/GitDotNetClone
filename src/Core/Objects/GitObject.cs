@@ -7,14 +7,14 @@ namespace Core.Objects
     {
         public abstract string Type { get; }
         public abstract byte[] Content { get; }
-        public byte[] Serialize()
+        public byte[] AddHeader()
         {
             var header = $"{Type} {Content.Length}\0";
             var headerBytes = Encoding.UTF8.GetBytes(header);
             return headerBytes.Concat(Content).ToArray();
         }
 
-        public static GitObject Deserialize(byte[] source)
+        public static GitObject RemoveHeader(byte[] source)
         {
             int nullIndex = Array.IndexOf(source, (byte)0);
             if (nullIndex == -1)
@@ -40,7 +40,7 @@ namespace Core.Objects
 
         public string GetHash()
         {
-            var serialized = Serialize();
+            var serialized = AddHeader();
             return Convert.ToHexStringLower(SHA256.HashData(serialized));
         }
     }
