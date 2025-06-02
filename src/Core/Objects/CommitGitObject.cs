@@ -2,7 +2,7 @@
 
 namespace Core.Objects
 {
-    public class CommitGitObject : GitObject
+    public class CommitGitObject : IGitObject
     {
         public string TreeHash { get; }
         public string? ParentHash { get; }
@@ -10,12 +10,12 @@ namespace Core.Objects
         public string Committer { get; }
         public string Message { get; }
 
-        public override string Type => "commit";
+        public string Type => "commit";
 
         /// <summary>
         /// The serialized content of the commit, as per Git object format.
         /// </summary>
-        public override byte[] Content => Encoding.UTF8.GetBytes(BuildCommitContent());
+        public byte[] Content => Encoding.UTF8.GetBytes(BuildCommitContent());
 
         /// <summary>
         /// Initializes a new commit object.
