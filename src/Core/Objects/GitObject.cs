@@ -1,45 +1,54 @@
-﻿using System.Security.Cryptography;
+﻿using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Core.Objects
 {
     public abstract class GitObject
     {
+        /// <summary>
+        /// Gets raw content without header.
+        /// </summary>
+        public abstract byte[] GetContent();
         public abstract string Type { get; }
-        public abstract byte[] Content { get; }
-        public byte[] AddHeader()
+        private readonly JsonSerializerOptions _serializerOptions;
+         
+        protected GitObject()
         {
-            var header = $"{Type} {Content.Length}\0";
-            var headerBytes = Encoding.UTF8.GetBytes(header);
-            return headerBytes.Concat(Content).ToArray();
-        }
-
-        public static GitObject RemoveHeader(byte[] source)
-        {
-            int nullIndex = Array.IndexOf(source, (byte)0);
-            if (nullIndex == -1)
-                throw new FormatException("Invalid Git object format.");
-
-            string header = Encoding.UTF8.GetString(source, 0, nullIndex);
-            byte[] content = source[(nullIndex + 1)..];
-
-            string[] parts = header.Split(' ');
-            if (parts.Length != 2)
-                throw new FormatException("Invalid Git object header format.");
-
-            string type = parts[0];
-
-            return type switch
+            _serializerOptions = new()
             {
-                "blob" => new BlobGitObject(content),
-                "tree" => new TreeGitObject(content),
-                _ => throw new NotSupportedException($"Unsupported type: {type}")
+                WriteIndented = true
             };
         }
 
+        /// <summary>
+        /// Serializes the current <see cref="GitObject"/> instance to a UTF-8 encoded JSON byte array.
+        /// </summary>
+        /// <returns>A <see cref="byte"/> array containing the UTF-8 encoded JSON representation of the object.</returns>
+        public byte[] SerializeToUtf8()
+        {
+            return JsonSerializer.SerializeToUtf8Bytes(this, _serializerOptions);
+        }
+
+        /// <summary>
+        /// Deserializes the current Git object's content into the specified derived <see cref="GitObject"/> type.
+        /// </summary>
+        /// <typeparam name="T">The type of <see cref="GitObject"/> to deserialize into.</typeparam>
+        /// <returns>An instance of <typeparamref name="T"/> representing the deserialized Git object.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if deserialization returns <c>null</c>.</exception>
+        public T Deserialize<T>() where T : GitObject
+        {
+            T? result = JsonSerializer.Deserialize<T>(GetContent(), _serializerOptions);
+            return result ?? throw new InvalidOperationException("Deserialization returned null.");
+        }
+
+        /// <summary>
+        /// Computes the full hash (based on type + content).
+        /// </summary>
         public string GetHash()
         {
-            var serialized = AddHeader();
+            byte[] serialized = GetContent();
             return Convert.ToHexStringLower(SHA256.HashData(serialized));
         }
     }

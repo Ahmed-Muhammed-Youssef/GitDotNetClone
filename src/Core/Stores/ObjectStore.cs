@@ -9,21 +9,19 @@ namespace Core.Stores
     public static class ObjectStore
     {
         /// <summary>
-        /// Loads a Git object from the object store using its hash.
+        /// Loads the byte array of a Git object from the object store using its hash.
         /// </summary>
-        /// <param name="hash">The SHA-1 or SHA-256 hash of the Git object.</param>
-        /// <returns>The deserialized <see cref="GitObject"/> instance.</returns>
+        /// <param name="hash">The SHA-256 hash of the Git object.</param>
+        /// <returns>The deserialized <see cref="byte[]"/> instance.</returns>
         /// <exception cref="FileNotFoundException">Thrown if the object file does not exist.</exception>
         /// <exception cref="FormatException">Thrown if the object file format is invalid.</exception>
-        public static GitObject Load(string hash)
+        public static byte[] Load(string hash)
         {
-            string suffix = hash[2..];
-
             string filePath = Path.Combine(".git", "objects", hash[..2], hash[2..]);
 
             byte[] data = File.ReadAllBytes(filePath);
 
-            return GitObject.RemoveHeader(data);
+            return data;
         }
 
         /// <summary>
@@ -38,7 +36,7 @@ namespace Core.Stores
         public static void Save(GitObject obj)
         {
             string hash = obj.GetHash();
-            byte[] content = obj.AddHeader();
+            byte[] content = obj.GetContent();
             string dir = Path.Combine(".git", "objects", hash[..2]);
             string file = Path.Combine(dir, hash[2..]);
 

@@ -97,7 +97,7 @@ namespace Core.Stores
         {
             var hash = obj.GetHash();
             var path = Path.Combine(_objectsDirectory, hash);
-            File.WriteAllBytes(path, obj.AddHeader());
+            File.WriteAllBytes(path, obj.GetContent());
         }
     }
 }

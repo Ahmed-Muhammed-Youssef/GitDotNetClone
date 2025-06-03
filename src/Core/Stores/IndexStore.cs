@@ -58,7 +58,7 @@ namespace Core.Stores
 
             realtivePath = PathHelper.Normalize(realtivePath);
 
-            IndexEntry entry = new(realtivePath, blob.GetHash(), blob.Content.LongLength);
+            IndexEntry entry = new(realtivePath, blob.GetHash(), blob.GetContent().LongLength);
 
             AddOrUpdate(entry);
         }

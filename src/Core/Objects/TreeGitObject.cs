@@ -7,8 +7,8 @@ namespace Core.Objects
     {
         public List<TreeEntry> TreeEntries { get; } = [];
         public override string Type => "tree";
-
-        public override byte[] Content { get; } = [];
+        private readonly byte[] _content;
+        public override byte[] GetContent() => _content;
         
         /// <summary>
         /// Construct a new tree object from entries.
@@ -16,7 +16,7 @@ namespace Core.Objects
         public TreeGitObject(List<TreeEntry> entries)
         {
             TreeEntries = entries;
-            Content = SerializeTreeEntries(entries);
+            _content = SerializeTreeEntries(entries);
         }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Core.Objects
         /// </summary>
         public TreeGitObject(byte[] content)
         {
-            Content = content;
+            _content = content;
             TreeEntries = DeserializeTreeEntries(content);
         }
 
