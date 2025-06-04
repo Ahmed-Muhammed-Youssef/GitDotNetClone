@@ -15,9 +15,9 @@ namespace Core.Stores
         /// <returns>The deserialized <see cref="byte[]"/> instance.</returns>
         /// <exception cref="FileNotFoundException">Thrown if the object file does not exist.</exception>
         /// <exception cref="FormatException">Thrown if the object file format is invalid.</exception>
-        public static byte[] Load(string hash)
+        public static byte[] Load(string hash, string rootPath)
         {
-            string filePath = Path.Combine(".git", "objects", hash[..2], hash[2..]);
+            string filePath = Path.Combine(rootPath, ".git", "objects", hash[..2], hash[2..]);
 
             byte[] data = File.ReadAllBytes(filePath);
 
@@ -33,11 +33,11 @@ namespace Core.Stores
         /// <exception cref="InvalidOperationException">
         /// Thrown if a hash collision occurs (i.e., an object with the same hash exists but with different content).
         /// </exception>
-        public static void Save(GitObject obj)
+        public static void Save(GitObject obj, string rootPath)
         {
             string hash = obj.GetHash();
             byte[] content = obj.GetContent();
-            string dir = Path.Combine(".git", "objects", hash[..2]);
+            string dir = Path.Combine(rootPath, ".git", "objects", hash[..2]);
             string file = Path.Combine(dir, hash[2..]);
 
             if (!Directory.Exists(dir))

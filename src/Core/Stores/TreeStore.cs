@@ -5,10 +5,8 @@ using Core.Stores.Interfaces;
 
 namespace Core.Stores
 {
-    public class TreeStore(IIndexStore indexStore, string repositoryRoot)
+    public class TreeStore(IIndexStore indexStore, string rootPath)
     {
-        private readonly string _objectsDirectory = Path.Combine(repositoryRoot, ".git", "objects");
-
         /// <summary>
         /// Builds the tree structure from the current index entries and saves all Git tree objects.
         /// Returns the root tree's hash.
@@ -24,7 +22,7 @@ namespace Core.Stores
 
             // Save root tree object and return its hash
             TreeGitObject rootTree = new(rootTreeEntries);
-            ObjectStore.Save(rootTree);
+            ObjectStore.Save(rootTree, rootPath);
             return rootTree.GetHash();
         }
 
@@ -78,7 +76,7 @@ namespace Core.Stores
 
                 List<TreeEntry> subtreeEntries = BuildTreeRecursive(subEntries, newPath);
                 TreeGitObject subtreeObject = new(subtreeEntries);
-                ObjectStore.Save(subtreeObject);
+                ObjectStore.Save(subtreeObject, rootPath);
                 treeEntries.Add(new TreeEntry(GitFileModes.Tree, dirName, subtreeObject.GetHash()));
             }
 
