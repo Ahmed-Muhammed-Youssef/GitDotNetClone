@@ -5,7 +5,7 @@ using Core.Stores.Interfaces;
 
 namespace Core.Stores
 {
-    public class TreeStore(IIndexStore indexStore, string rootPath)
+    public class TreeStore(IIndexStore indexStore, string rootPath) : ITreeStore
     {
         /// <summary>
         /// Builds the tree structure from the current index entries and saves all Git tree objects.
