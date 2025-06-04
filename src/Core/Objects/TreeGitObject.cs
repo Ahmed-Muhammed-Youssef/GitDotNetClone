@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-
-namespace Core.Objects
+﻿namespace Core.Objects
 {
     public class TreeGitObject : GitObject
     {
@@ -16,7 +13,7 @@ namespace Core.Objects
         public TreeGitObject(List<TreeEntry> entries)
         {
             TreeEntries = entries;
-            _content = SerializeTreeEntries(entries);
+            _content = SerializeToUtf8();
         }
 
         /// <summary>
@@ -25,19 +22,8 @@ namespace Core.Objects
         public TreeGitObject(byte[] content)
         {
             _content = content;
-            TreeEntries = DeserializeTreeEntries(content);
-        }
-
-        private static byte[] SerializeTreeEntries(List<TreeEntry> entries)
-        {
-            string json = JsonSerializer.Serialize(entries);
-            return Encoding.UTF8.GetBytes(json);
-        }
-
-        private static List<TreeEntry> DeserializeTreeEntries(byte[] content)
-        {
-            string json = Encoding.UTF8.GetString(content);
-            return JsonSerializer.Deserialize<List<TreeEntry>>(json) ?? [];
+            TreeGitObject treeGitObject = Deserialize<TreeGitObject>();
+            TreeEntries = treeGitObject.TreeEntries;
         }
     }
 }

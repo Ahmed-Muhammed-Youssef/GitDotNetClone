@@ -1,4 +1,5 @@
-﻿using Core.Index;
+﻿using Core.Constants;
+using Core.Index;
 using Core.Objects;
 using Core.Stores.Interfaces;
 
@@ -23,7 +24,7 @@ namespace Core.Stores
 
             // Save root tree object and return its hash
             TreeGitObject rootTree = new(rootTreeEntries);
-            SaveGitObject(rootTree);
+            ObjectStore.Save(rootTree);
             return rootTree.GetHash();
         }
 
@@ -50,9 +51,8 @@ namespace Core.Stores
                 if (separatorIndex == -1)
                 {
                     // It's a file in the current directory (a leaf node)
-                    var mode = "100644"; // default file mode
                     var fileName = relativePath;
-                    treeEntries.Add(new TreeEntry(mode, fileName, entry.BlobHash));
+                    treeEntries.Add(new TreeEntry(GitFileModes.RegularFile, fileName, entry.BlobHash));
                 }
                 else
                 {
@@ -78,26 +78,13 @@ namespace Core.Stores
 
                 List<TreeEntry> subtreeEntries = BuildTreeRecursive(subEntries, newPath);
                 TreeGitObject subtreeObject = new(subtreeEntries);
-                SaveGitObject(subtreeObject);
-
-                string mode = "40000"; // directory mode
-                treeEntries.Add(new TreeEntry(mode, dirName, subtreeObject.GetHash()));
+                ObjectStore.Save(subtreeObject);
+                treeEntries.Add(new TreeEntry(GitFileModes.Tree, dirName, subtreeObject.GetHash()));
             }
 
             treeEntries.Sort((a, b) => string.CompareOrdinal(a.Name, b.Name));
 
             return treeEntries;
-        }
-
-
-        /// <summary>
-        /// Saves a Git object to the object store using its hash as filename.
-        /// </summary>
-        private void SaveGitObject(GitObject obj)
-        {
-            var hash = obj.GetHash();
-            var path = Path.Combine(_objectsDirectory, hash);
-            File.WriteAllBytes(path, obj.GetContent());
         }
     }
 }
