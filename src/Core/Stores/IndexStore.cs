@@ -72,8 +72,8 @@ namespace Core.Stores
             if (!File.Exists(_indexFilePath))
                 return;
 
-            var json = File.ReadAllText(_indexFilePath);
-            _entries = JsonSerializer.Deserialize<List<IndexEntry>>(json) ?? [];
+            byte[] jsonBytes = File.ReadAllBytes(_indexFilePath);
+            _entries = JsonSerializer.Deserialize<List<IndexEntry>>(jsonBytes) ?? [];
         }
 
         /// <summary>
@@ -81,8 +81,8 @@ namespace Core.Stores
         /// </summary>
         public void Save()
         {
-            string json = JsonSerializer.Serialize(_entries, jsonSerializerOptions);
-            File.WriteAllText(_indexFilePath, json);
+            byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(_entries, jsonSerializerOptions);
+            File.WriteAllBytes(_indexFilePath, jsonBytes);
         }
 
         /// <summary>
