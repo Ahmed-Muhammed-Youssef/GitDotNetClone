@@ -14,6 +14,7 @@ namespace Core.Stores
         /// <param name="hash">The SHA-256 hash of the Git object.</param>
         /// <returns>The deserialized <see cref="byte[]"/> instance.</returns>
         /// <exception cref="FileNotFoundException">Thrown if the object file does not exist.</exception>
+        /// <exception cref="DirectoryNotFoundException">Thrown if the directory is found.</exception>
         /// <exception cref="FormatException">Thrown if the object file format is invalid.</exception>
         public static byte[] Load(string hash, string rootPath)
         {
