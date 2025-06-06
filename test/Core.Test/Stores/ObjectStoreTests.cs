@@ -19,6 +19,7 @@ namespace Core.Test.Stores
             {
                 Directory.Delete(_tempRoot, recursive: true);
             }
+            GC.SuppressFinalize(this);
         }
 
         private static BlobGitObject CreateBlob(string content)

@@ -21,6 +21,8 @@ namespace Core.Test.Stores
         {
             if (Directory.Exists(_tempRoot))
                 Directory.Delete(_tempRoot, recursive: true);
+
+            GC.SuppressFinalize(this);
         }
 
         [Fact]
