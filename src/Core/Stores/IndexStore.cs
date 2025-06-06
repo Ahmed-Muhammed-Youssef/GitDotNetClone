@@ -17,6 +17,7 @@ namespace Core.Stores
 
         /// <summary>
         /// Gets a read-only list of the current entries in the index.
+        /// Note: File paths are normalized
         /// </summary>
         public IReadOnlyList<IndexEntry> GetEntries() => _entries;
 
@@ -99,9 +100,10 @@ namespace Core.Stores
         }
 
         /// <summary>
-        /// Gets untracked files, files that doesn't exist in the entries of the index.
+        /// Gets untracked files paths, files that doesn't exist in the entries of the index.
+        /// Note: file paths are normalized
         /// </summary>
-        /// 
+        ///  
         public List<string> GetUntrackedFiles()
         {
             var trackedPaths = new HashSet<string>(GetEntries().Select(e => PathHelper.Denormalize(e.FilePath)));
