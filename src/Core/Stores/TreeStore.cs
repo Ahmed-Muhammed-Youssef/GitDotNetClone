@@ -18,9 +18,9 @@ namespace Core.Stores
             indexStore.Load();
             IReadOnlyList<IndexEntry> indexEntries = indexStore.GetEntries();
 
-            if(indexEntries.Count == 0)
+            if (indexEntries.Count == 0)
             {
-              
+
                 return string.Empty;
             }
 
@@ -43,26 +43,27 @@ namespace Core.Stores
 
             foreach (var entry in entries)
             {
-                if (!entry.FilePath.StartsWith(currentPath, StringComparison.Ordinal))
+                string currentEntryPath = entry.FilePath;
+
+                if (!currentEntryPath.StartsWith(currentPath, StringComparison.Ordinal))
                     continue;
 
-                string relativePath = entry.FilePath[currentPath.Length..].TrimStart(Path.DirectorySeparatorChar);
+                string relativePath = currentEntryPath[currentPath.Length..].TrimStart('/');
 
                 if (string.IsNullOrEmpty(relativePath))
                     continue;
 
-                int separatorIndex = relativePath.IndexOf(Path.DirectorySeparatorChar);
+                int separatorIndex = relativePath.IndexOf('/');
 
                 if (separatorIndex == -1)
                 {
                     // It's a file in the current directory (a leaf node)
-                    var fileName = relativePath;
-                    treeEntries.Add(new TreeEntry(GitFileModes.RegularFile, fileName, entry.BlobHash));
+                    treeEntries.Add(new TreeEntry(GitFileModes.RegularFile, relativePath, entry.BlobHash));
                 }
                 else
                 {
                     // It's inside a subdirectory
-                    var dirName = relativePath[..separatorIndex];
+                    string dirName = relativePath[..separatorIndex];
                     if (!subdirectoryGroups.TryGetValue(dirName, out List<IndexEntry>? list))
                     {
                         list = [];
@@ -78,8 +79,8 @@ namespace Core.Stores
                 List<IndexEntry> subEntries = kvp.Value;
 
                 string newPath = string.IsNullOrEmpty(currentPath)
-                    ? dirName + Path.DirectorySeparatorChar
-                    : currentPath + dirName + Path.DirectorySeparatorChar;
+                    ? dirName + '/'
+                    : currentPath + dirName + '/';
 
                 List<TreeEntry> subtreeEntries = BuildTreeRecursive(subEntries, newPath);
                 TreeGitObject subtreeObject = new(subtreeEntries);
