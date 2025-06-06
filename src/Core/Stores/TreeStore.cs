@@ -10,12 +10,19 @@ namespace Core.Stores
         /// <summary>
         /// Builds the tree structure from the current index entries and saves all Git tree objects.
         /// Returns the root tree's hash.
+        /// If the index is empty, returns an empty string.
         /// </summary>
         public string BuildTreeFromIndex()
         {
 
             indexStore.Load();
             IReadOnlyList<IndexEntry> indexEntries = indexStore.GetEntries();
+
+            if(indexEntries.Count == 0)
+            {
+              
+                return string.Empty;
+            }
 
             // Start recursive tree build from the root
             List<TreeEntry> rootTreeEntries = BuildTreeRecursive(indexEntries, "");

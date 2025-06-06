@@ -16,6 +16,14 @@ namespace CLI.Commands
             string message = _args[0];
             string treeHash = treeStore.BuildTreeFromIndex();
 
+            if(string.IsNullOrEmpty(treeHash))
+            {
+                Console.WriteLine("On branch main");
+                Console.WriteLine("Nothing to commit, working tree clean");
+
+                return Task.CompletedTask;
+            }
+
             CommitGitObject commitObject = new(treeHash, "", "", "", message);
 
             ObjectStore.Save(commitObject, _root);
