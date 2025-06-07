@@ -9,11 +9,11 @@
         /// <summary>
         /// Converts all directory separators to '/' for cross-platform consistency.
         /// </summary>
-        /// <param name="relativePath">The absolute file or directory path to normalize.</param>
+        /// <param name="path">The file or directory path to normalize.</param>
         /// <returns>A normalized path using '/' as separator.</returns>
-        public static string Normalize(string relativePath)
+        public static string Normalize(string path)
         {
-            return relativePath.Replace(Path.DirectorySeparatorChar, '/');
+            return path.Replace('\\', '/');
         }
 
         /// <summary>
