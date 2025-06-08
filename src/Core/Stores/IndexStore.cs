@@ -94,7 +94,14 @@ namespace Core.Stores
         {
             var existing = _entries.FirstOrDefault(e => e.FilePath == entry.FilePath);
             if (existing != null)
+            {
+                if (existing.BlobHash == entry.BlobHash && existing.Size == entry.Size)
+                {
+                    // File hasn't changed, skip update
+                    return;
+                }
                 _entries.Remove(existing);
+            }
 
             _entries.Add(entry);
         }
