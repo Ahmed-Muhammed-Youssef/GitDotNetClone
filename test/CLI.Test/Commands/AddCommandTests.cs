@@ -99,6 +99,9 @@ namespace CLI.Test.Commands
         [Fact]
         public void Create_ValidArgs_ReturnsCommand()
         {
+            //Arrange
+            Directory.CreateDirectory(Path.Combine(_tempRoot, ".git")); // Ensure .git directory exists
+
             // Act
             var result = AddCommand.Create(["."]);
 
