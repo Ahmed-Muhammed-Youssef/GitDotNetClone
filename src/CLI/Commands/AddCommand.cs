@@ -1,10 +1,10 @@
-﻿using CLI.Services;
+﻿using Core.Services;
 using Core.Stores;
 using System.Text.Json;
 
 namespace CLI.Commands
 {
-    public class AddCommand(IndexStore indexStore, string[] args) : IGitCommand
+    public class AddCommand(IndexStore indexStore, string[] args, IGitContextProvider gitContextProvider) : IGitCommand
     {
         private readonly IndexStore _indexStore = indexStore;
         private readonly string[] args = args;
@@ -21,11 +21,11 @@ namespace CLI.Commands
         {
             if (args[0] == ".")
             {
-                _indexStore.AddDirectory(Directory.GetCurrentDirectory());
+                _indexStore.AddDirectory(gitContextProvider.GetWorkingDirectory());
             }
             else
             {
-                string absolutePath = Path.Combine(Directory.GetCurrentDirectory(), args[0]);
+                string absolutePath = Path.Combine(gitContextProvider.GetWorkingDirectory(), args[0]);
 
                 if (Directory.Exists(absolutePath))
                 {
@@ -51,7 +51,7 @@ namespace CLI.Commands
         /// <returns>
         /// An instance of <see cref="IGitCommand"/> representing the add command, or null if the arguments are invalid or not in a Git repository.
         /// </returns>
-        public static IGitCommand? Create(string[] args)
+        public static IGitCommand? Create(string[] args, IGitContextProvider gitContextProvider)
         {
             if (args.Length != 1)
             {
@@ -59,9 +59,7 @@ namespace CLI.Commands
                 return null;
             }
 
-            GitContextProvider _gitContextProvider = new();
-
-            if (!_gitContextProvider.TryGetRepositoryRoot(out string root))
+            if (!gitContextProvider.TryGetRepositoryRoot(out string root))
             {
                 Console.WriteLine("Error: Not a git repository (or any of the parent directories).");
                 return null;
@@ -73,7 +71,7 @@ namespace CLI.Commands
             };
 
             IndexStore indexStore = new(root, jsonOptions);
-            return new AddCommand(indexStore, args);
+            return new AddCommand(indexStore, args, gitContextProvider);
         }
     }
 }

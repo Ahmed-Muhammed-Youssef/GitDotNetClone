@@ -1,4 +1,5 @@
 ﻿using CLI.Commands;
+using Core.Services;
 
 namespace CLI
 {
@@ -6,7 +7,7 @@ namespace CLI
     {
         static async Task Main(string[] args)
         {
-            var commandFactoriesDictionary = new Dictionary<string, Func<string[], IGitCommand?>>
+            var commandFactoriesDictionary = new Dictionary<string, Func<string[], IGitContextProvider, IGitCommand?>>
             {
                 { InitCommand.Name, InitCommand.Create },
                 { AddCommand.Name, AddCommand.Create },

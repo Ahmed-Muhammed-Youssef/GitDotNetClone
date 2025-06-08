@@ -1,4 +1,5 @@
 ﻿using CLI.Services;
+using Core.Services;
 using Core.Stores;
 using System.Text.Json;
 
@@ -30,11 +31,9 @@ namespace CLI.Commands
                 return Task.CompletedTask;
             }
         }
-        public static IGitCommand? Create(string[] args)
+        public static IGitCommand? Create(string[] args, IGitContextProvider gitContextProvider)
         {
-            GitContextProvider _gitContextProvider = new();
-
-            if (!_gitContextProvider.TryGetRepositoryRoot(out string root))
+            if (!gitContextProvider.TryGetRepositoryRoot(out string root))
             {
                 Console.WriteLine("Error: Not a git repository (or any of the parent directories).");
                 return null;

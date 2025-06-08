@@ -1,12 +1,18 @@
-﻿namespace CLI.Commands
+﻿using Core.Objects;
+using Core.Services;
+using System.Text.Json;
+
+namespace CLI.Commands
 {
-    public class InitCommand() : IGitCommand
+    public class InitCommand(JsonSerializerOptions jsonOptions, string repoPath) : IGitCommand
     {
         public static string Name => "init";
-        private static readonly string _gitDir = ".git";
-        private static readonly string _objectsDir = Path.Combine(_gitDir, "objects");
-        private static readonly string _infoDir = Path.Combine(_objectsDir, "info");
-        private static readonly string _packDir = Path.Combine(_objectsDir, "pack");
+        private readonly string _gitDir = Path.Combine(repoPath, ".git");
+        private readonly string _objectsDir = Path.Combine(repoPath, ".git", "objects");
+        private readonly string _infoDir = Path.Combine(repoPath, ".git", "objects", "info");
+        private readonly string _packDir = Path.Combine(repoPath, ".git", "objects", "pack");
+        private readonly string _refsHeadsDir = Path.Combine(repoPath, ".git", "refs", "heads");
+        private readonly string _headFilePath = Path.Combine(repoPath, ".git", "HEAD");
 
         /// <summary>
         /// Executes the initialization of a new Git repository by creating the required directory structure.
@@ -20,6 +26,14 @@
             Directory.CreateDirectory(_objectsDir);
             Directory.CreateDirectory(_infoDir);
             Directory.CreateDirectory(_packDir);
+            Directory.CreateDirectory(_refsHeadsDir);
+
+            // Write HEAD.json file
+            HeadReference head = new() { Ref = "refs/heads/main" };
+
+            string headJson = JsonSerializer.Serialize(head, jsonOptions);
+
+            await File.WriteAllTextAsync(_headFilePath, headJson);
 
             Console.WriteLine("Initialized empty git repository.");
 
@@ -33,7 +47,7 @@
         /// <returns>
         /// An instance of <see cref="IGitCommand"/> if the command can be created; otherwise, <c>null</c>.
         /// </returns>
-        public static IGitCommand? Create(string[] args)
+        public static IGitCommand? Create(string[] args, IGitContextProvider gitContext)
         {
             if (args.Length > 1)
             {
@@ -41,12 +55,15 @@
                 return null;
             }
 
-            if (Directory.Exists(_gitDir))
+            if(gitContext.TryGetRepositoryRoot(out string repoPath))
             {
-                Console.WriteLine("A Git repository already exists in this directory.");
+                Console.WriteLine("A Git repository already exists in the current directory or any of its parent directories.");
                 return null;
             }
-            return new InitCommand();
+            
+            JsonSerializerOptions jsonOptions = new() { WriteIndented = true };
+
+            return new InitCommand(jsonOptions, repoPath);
         }
     }
 }

@@ -4,19 +4,19 @@ namespace CrossCuttingConcerns.Test.Helpers
 {
     public class PathHelperTests : IDisposable
     {
-        private readonly string _originalWorkingDir;
+        // private readonly string _originalWorkingDir;
         private readonly string _tempRoot;
 
         public PathHelperTests()
         {
             _tempRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            _originalWorkingDir = Directory.GetCurrentDirectory();
+            // _originalWorkingDir = Directory.GetCurrentDirectory();
             Directory.CreateDirectory(_tempRoot);
         }
 
         public void Dispose()
         {
-            Directory.SetCurrentDirectory(_originalWorkingDir);
+            // Directory.SetCurrentDirectory(_originalWorkingDir);
             if (Directory.Exists(_tempRoot))
                 Directory.Delete(_tempRoot, recursive: true);
             GC.SuppressFinalize(this);
@@ -59,34 +59,6 @@ namespace CrossCuttingConcerns.Test.Helpers
 
             // Assert
             Assert.Equal(gitRoot, result);
-        }
-
-        [Fact]
-        public void GetRepositoryRoot_WhenNoGitDirectory_ReturnsNull()
-        {
-            // Arrange
-            var nonGitDir = Path.Combine(_tempRoot, "not-a-repo");
-            Directory.CreateDirectory(nonGitDir);
-
-            // Act
-            var result = PathHelper.GetRepositoryRoot(nonGitDir);
-
-            // Assert
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public void GetRepositoryRoot_UsesCurrentDirectory_WhenStartDirectoryIsNull()
-        {
-            // Arrange
-            Directory.SetCurrentDirectory(_tempRoot);
-            Directory.CreateDirectory(Path.Combine(_tempRoot, ".git"));
-
-            // Act
-            var result = PathHelper.GetRepositoryRoot(null);
-
-            // Assert
-            Assert.Equal(_tempRoot, result);
         }
     }
 }

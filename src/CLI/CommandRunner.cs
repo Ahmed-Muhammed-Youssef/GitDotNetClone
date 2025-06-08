@@ -1,8 +1,10 @@
 ﻿using CLI.Commands;
+using CLI.Services;
+using Core.Services;
 
 namespace CLI
 {
-    public class CommandRunner(Dictionary<string, Func<string[], IGitCommand?>> commandsFactoriesDictionary)
+    public class CommandRunner(Dictionary<string, Func<string[], IGitContextProvider, IGitCommand?>> commandsFactoriesDictionary)
     {
         public async Task RunAsync(string[] args)
         {
@@ -16,7 +18,7 @@ namespace CLI
             if (commandsFactoriesDictionary.TryGetValue(commandName, out var commandFactory))
             {
 
-                IGitCommand? command = commandFactory.Invoke(args.Skip(1).ToArray());
+                IGitCommand? command = commandFactory.Invoke(args.Skip(1).ToArray(), new GitContextProvider());
 
                 if(command is null)
                 {
