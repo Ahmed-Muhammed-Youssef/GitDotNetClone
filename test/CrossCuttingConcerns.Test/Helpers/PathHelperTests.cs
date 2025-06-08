@@ -4,19 +4,16 @@ namespace CrossCuttingConcerns.Test.Helpers
 {
     public class PathHelperTests : IDisposable
     {
-        // private readonly string _originalWorkingDir;
         private readonly string _tempRoot;
 
         public PathHelperTests()
         {
             _tempRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            // _originalWorkingDir = Directory.GetCurrentDirectory();
             Directory.CreateDirectory(_tempRoot);
         }
 
         public void Dispose()
         {
-            // Directory.SetCurrentDirectory(_originalWorkingDir);
             if (Directory.Exists(_tempRoot))
                 Directory.Delete(_tempRoot, recursive: true);
             GC.SuppressFinalize(this);

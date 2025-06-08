@@ -21,13 +21,10 @@ namespace CLI.Test.Commands
 
             _jsonOptions = new JsonSerializerOptions { WriteIndented = true };
             _indexStore = new IndexStore(_tempRoot, _jsonOptions);
-
-            // Directory.SetCurrentDirectory(_tempRoot);
         }
 
         public void Dispose()
         {
-            // Directory.SetCurrentDirectory(Path.GetTempPath());
             if (Directory.Exists(_tempRoot))
                 Directory.Delete(_tempRoot, recursive: true);
             GC.SuppressFinalize(this);
