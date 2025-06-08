@@ -1,5 +1,4 @@
 ﻿using CLI.Commands;
-using CLI.Services;
 
 namespace CLI
 {
