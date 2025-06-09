@@ -87,19 +87,19 @@ namespace Core.Stores
                 return result;
 
             string commitHash = branch.Commit;
-            string commitPath = Path.Combine(root, ".git", "objects", commitHash);
+            string commitPath = Path.Combine(root, ".git", "objects", commitHash[..2], commitHash[2..]);
             if (!File.Exists(commitPath))
                 return result;
 
             byte[] commitBytes = File.ReadAllBytes(commitPath);
             CommitGitObject commit = JsonSerializer.Deserialize<CommitGitObject>(commitBytes, jsonOptions)!;
 
-            string treePath = Path.Combine(root, ".git", "objects", commit.TreeHash);
+            string treePath = Path.Combine(root, ".git", "objects", commit.TreeHash[..2], commit.TreeHash[2..]);
             if (!File.Exists(treePath))
                 return result;
 
             byte[] treeBytes = File.ReadAllBytes(treePath);
-            TreeGitObject tree = JsonSerializer.Deserialize<TreeGitObject>(treeBytes, jsonOptions)!;
+            TreeGitObject tree = new(treeBytes);
 
             foreach (var entry in tree.TreeEntries)
                 result[entry.Name] = entry.Hash;
