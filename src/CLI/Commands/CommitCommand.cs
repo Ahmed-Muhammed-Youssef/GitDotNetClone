@@ -25,7 +25,7 @@ namespace CLI.Commands
             }
          
             // Get the current branch reference
-            HeadReference? head = GetHeadReference(_root, jsonOptions);
+            HeadReference? head = HeadStore.GetHeadReference(_root, jsonOptions);
 
             if (head == null || string.IsNullOrWhiteSpace(head.Ref))
             {
@@ -35,7 +35,7 @@ namespace CLI.Commands
 
             string branchRefPath = Path.Combine(_root, ".git", head.Ref.Replace('/', Path.DirectorySeparatorChar));
 
-            BranchRef? branchRef = GetBranchReference(head, _root, jsonOptions);
+            BranchRef? branchRef = HeadStore.GetBranchReference(head, _root, jsonOptions);
 
             string? parentHash = branchRef?.Commit;
 
@@ -59,7 +59,7 @@ namespace CLI.Commands
             var commitHash = commitObject.GetHash();
 
             // Update the branch reference to point to the new commit
-            UpdateBranchReference(branchRefPath, commitHash, jsonOptions);
+            HeadStore.UpdateBranchReference(branchRefPath, commitHash, jsonOptions);
 
             Console.WriteLine($"[main {commitHash[..7]}] {message}");
 
@@ -90,34 +90,5 @@ namespace CLI.Commands
             return new CommitCommand(treeStore, args, root, jsonOptions);
         }
 
-        private static HeadReference? GetHeadReference(string root, JsonSerializerOptions jsonOptions)
-        {
-            string headFilePath = Path.Combine(root, ".git", "HEAD");
-            if (!File.Exists(headFilePath))
-            {
-                return null;
-            }
-            string headJson = File.ReadAllText(headFilePath);
-            HeadReference? head = JsonSerializer.Deserialize<HeadReference>(headJson, jsonOptions);
-            return head;
-        }
-
-        private static BranchRef? GetBranchReference(HeadReference head, string root, JsonSerializerOptions jsonOptions)
-        {
-            string branchRefPath = Path.Combine(root, ".git", head.Ref.Replace('/', Path.DirectorySeparatorChar));
-            if (!File.Exists(branchRefPath))
-            {
-                return null;
-            }
-            byte[] branchRefBytes = File.ReadAllBytes(branchRefPath);
-            return JsonSerializer.Deserialize<BranchRef>(branchRefBytes, jsonOptions);
-        }
-
-        private static void UpdateBranchReference(string branchRefPath, string commitHash, JsonSerializerOptions jsonOptions)
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(branchRefPath)!);
-            byte[] branchBytes = JsonSerializer.SerializeToUtf8Bytes(new BranchRef() { Commit = commitHash }, jsonOptions);
-            File.WriteAllBytes(branchRefPath, branchBytes);
-        }
     }
 }
