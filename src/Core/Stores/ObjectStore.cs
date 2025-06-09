@@ -50,16 +50,20 @@ namespace Core.Stores
         }
 
         /// <summary>
-        /// Saves a Git object to the object store if it does not already exist.
-        /// Git objects are stored under .git/objects/xx/yyyy... where "xx" is the first
-        /// two characters of the object's hash and "yyyy..." is the remaining part.
+        /// Saves a Git object of type <typeparamref name="T"/> to the object store if it does not already exist.
+        /// The object is stored under the path <c>.git/objects/xx/yyyy...</c> where:
+        /// <list type="bullet">
+        ///   <item><description><c>xx</c> is the first two characters of the object's SHA-256 hash</description></item>
+        ///   <item><description><c>yyyy...</c> is the remaining part of the hash</description></item>
+        /// </list>
         /// </summary>
-        /// <param name="obj">The <see cref="GitObject"/> to save.</param>
+        /// <typeparam name="T">The type of <see cref="GitObject"/> being saved.</typeparam>
+        /// <param name="obj">The Git object instance to save.</param>
         /// <param name="rootPath">The root path of the repository (where the <c>.git</c> directory resides).</param>
         /// <exception cref="InvalidOperationException">
-        /// Thrown if a hash collision occurs (i.e., an object with the same hash exists but with different content).
+        /// Thrown if a hash collision occurs (i.e., a file with the same hash already exists but its content differs from the current object).
         /// </exception>
-        public static void Save(GitObject obj, string rootPath)
+        public static void Save<T>(T obj, string rootPath) where T : GitObject
         {
             string hash = obj.GetHash();
             byte[] content = obj.GetContent();

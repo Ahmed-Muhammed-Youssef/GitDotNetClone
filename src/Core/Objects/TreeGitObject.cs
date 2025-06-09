@@ -13,7 +13,7 @@
         public TreeGitObject(List<TreeEntry> entries)
         {
             TreeEntries = entries;
-            _content = SerializeToUtf8();
+            _content = SerializeToUtf8(this);
         }
 
         /// <summary>

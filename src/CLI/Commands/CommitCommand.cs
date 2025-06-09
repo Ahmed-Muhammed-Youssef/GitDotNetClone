@@ -42,7 +42,7 @@ namespace CLI.Commands
             // If a previous commit exists, compare trees
             if (!string.IsNullOrEmpty(parentHash))
             {
-                var parentCommit = ObjectStore.Load<CommitGitObject>(parentHash, _root, jsonOptions);
+                CommitGitObject? parentCommit = ObjectStore.Load<CommitGitObject>(parentHash, _root, jsonOptions);
                 if (parentCommit != null && parentCommit.TreeHash == treeHash)
                 {
                     Console.WriteLine("On branch main");

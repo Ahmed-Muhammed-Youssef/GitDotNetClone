@@ -24,9 +24,9 @@ namespace Core.Objects
         /// Serializes the current <see cref="GitObject"/> instance to a UTF-8 encoded JSON byte array.
         /// </summary>
         /// <returns>A <see cref="byte"/> array containing the UTF-8 encoded JSON representation of the object.</returns>
-        public byte[] SerializeToUtf8()
+        public byte[] SerializeToUtf8<T>(T obj) where T : GitObject
         {
-            return JsonSerializer.SerializeToUtf8Bytes(this, _serializerOptions);
+            return JsonSerializer.SerializeToUtf8Bytes(obj, _serializerOptions);
         }
 
         /// <summary>
