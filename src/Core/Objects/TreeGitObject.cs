@@ -2,7 +2,7 @@
 {
     public class TreeGitObject : GitObject
     {
-        public List<TreeEntry> TreeEntries { get; } = [];
+        public List<TreeEntry> TreeEntries { get; init; } = [];
         public override string Type => "tree";
         private readonly byte[] _content;
         public override byte[] GetContent() => _content;
