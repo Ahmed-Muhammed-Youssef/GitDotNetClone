@@ -55,6 +55,73 @@ public class CommitCommandTests : IDisposable
         Assert.True(File.Exists(objectPath), "Commit object should be stored in object database");
     }
 
+    [Fact]
+    public async Task Commit_Twice_ShouldUpdateBranchHead()
+    {
+        // Arrange
+        InitCommand init = new(_jsonOptions, _root);
+        await init.ExecuteAsync();
+
+        string filePath = Path.Combine(_root, "file.txt");
+        await File.WriteAllTextAsync(filePath, "First version");
+
+        IndexStore indexStore = new(_root, _jsonOptions);
+        indexStore.AddFile(filePath);
+        indexStore.Save();
+
+        TreeStore treeStore = new(indexStore, _root);
+        CommitCommand commit1 = new(treeStore, ["First commit"], _root, _jsonOptions);
+        await commit1.ExecuteAsync();
+
+        string branchRefPath = Path.Combine(_root, ".git", "refs", "heads", "main");
+        string? firstCommit = JsonSerializer.Deserialize<BranchRef>(File.ReadAllBytes(branchRefPath), _jsonOptions)?.Commit;
+
+        await File.WriteAllTextAsync(filePath, "Second version");
+
+        indexStore.AddFile(filePath);
+        indexStore.Save();
+
+        treeStore = new(indexStore, _root);
+        CommitCommand commit2 = new(treeStore, ["Second commit"], _root, _jsonOptions);
+        await commit2.ExecuteAsync();
+
+        string? secondCommit = JsonSerializer.Deserialize<BranchRef>(File.ReadAllBytes(branchRefPath), _jsonOptions)?.Commit;
+
+        // Assert
+        Assert.NotEqual(firstCommit, secondCommit);
+    }
+
+    [Fact]
+    public async Task Commit_WithUnchangedTree_ShouldSkipCommit()
+    {
+        // Arrange
+        InitCommand init = new(_jsonOptions, _root);
+        await init.ExecuteAsync();
+
+        string filePath = Path.Combine(_root, "file.txt");
+        await File.WriteAllTextAsync(filePath, "Same content");
+
+        IndexStore indexStore = new(_root, _jsonOptions);
+        indexStore.AddFile(filePath);
+        indexStore.Save();
+
+        TreeStore treeStore = new(indexStore, _root);
+        CommitCommand commit1 = new(treeStore, ["Initial commit"], _root, _jsonOptions);
+        await commit1.ExecuteAsync();
+
+        var branchRefPath = Path.Combine(_root, ".git", "refs", "heads", "main");
+        var commitHash = JsonSerializer.Deserialize<BranchRef>(File.ReadAllBytes(branchRefPath), _jsonOptions)?.Commit;
+
+        // Try committing again without changes
+        CommitCommand commit2 = new(treeStore, ["No changes"], _root, _jsonOptions);
+        await commit2.ExecuteAsync();
+
+        var newCommitHash = JsonSerializer.Deserialize<BranchRef>(File.ReadAllBytes(branchRefPath), _jsonOptions)?.Commit;
+
+        // Assert
+        Assert.Equal(commitHash, newCommitHash);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_root))
