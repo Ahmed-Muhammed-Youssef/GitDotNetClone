@@ -39,8 +39,17 @@ namespace CLI.Commands
 
             string? parentHash = branchRef?.Commit;
 
-            // TODO: Compare tree with previous commit's tree if needed
-            // Skipped for now — assuming any new tree is a new commit.
+            // If a previous commit exists, compare trees
+            if (!string.IsNullOrEmpty(parentHash))
+            {
+                var parentCommit = ObjectStore.Load<CommitGitObject>(parentHash, _root, jsonOptions);
+                if (parentCommit != null && parentCommit.TreeHash == treeHash)
+                {
+                    Console.WriteLine("On branch main");
+                    Console.WriteLine("Nothing to commit, working tree clean");
+                    return Task.CompletedTask;
+                }
+            }
 
             // Save the commit object
             CommitGitObject commitObject = new(treeHash, parentHash, "Author", "Author", message);
