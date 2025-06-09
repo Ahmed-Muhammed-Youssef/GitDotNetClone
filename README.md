@@ -1,30 +1,99 @@
 # GitDotNetClone
 
-**GitDotNetClone** is a minimal version-control system written in C#, inspired by the internal architecture of Git. This project aims to demystify Git's core mechanisms like hashing, object storage, staging, and commits — implemented from scratch using idiomatic .NET code.
+**GitDotNetClone** is a minimal, educational version-control system built with C#. It is heavily inspired by Git’s internal architecture and provides hands-on insight into how core version control concepts—such as object storage, hashing, staging, and committing—work under the hood. This project is ideal for developers who want to deepen their understanding of Git or build their own Git-like tool.
 
-## 🚀 Features (In Progress)
+---
 
-- [x] `init` – Initialize a new repository (`.git` directory)
-- [x] `add` – Track changes to files by hashing and storing them
-- [ ] `commit` – Save a snapshot of the staged changes
-- [ ] `status` – Show current repository state
-- [ ] `log` – View commit history
+## 🚀 Implemented Commands
 
-## Project Main Components
+- `init` – Initialize a new repository (`.git` directory)
+- `add` – Hashes and stages file(s) by storing their content in the object store.
+- `commit` – Records the current staged snapshot along with metadata like message, tree, and parent.
+- `status` – Shows the current working directory state vs. index and last commit (HEAD).
 
-- **Object Storage**: Store and retrieve Git objects (blobs) using SHA-256 hashes.
-- **Index Management**: Add files and directories to a staging area (`.git/index`) with normalized paths.
-- **Path Utilities**: Cross-platform path normalization and repository root detection.
-- **Test Coverage**: xUnit-based tests for core storage and helper functionality.
+---
 
-## Project Structure
+## 🧠 Key Concepts & Architecture
 
-- `src/Core`: Core logic for object and index storage.
-- `src/CrossCuttingConcerns`: Shared helpers (e.g., `PathHelper`).
-- `test/`: Unit tests for all major components.
+### 🔹 Object Storage
+- All files are stored as **blobs** in a `.git/objects` folder.
+- SHA-256 is used to generate content-based hashes (unlike Git’s SHA-1).
+- Objects are stored in a subdirectory based on the first two characters of the hash (e.g., `.git/objects/ab/cdef123...`).
+- All git objects are stored in JSON format for simplicity.
 
-## Testing
+### 🔹 Index (Staging Area)
+- Tracks the current state of files added via `add`.
+- Maintains file paths and associated content hashes.
+- Stored in JSON format inside `.git/index`.
 
-- Uses xUnit for unit testing.
-- Run all tests with `dotnet test`.
-   
+### 🔹 Commits
+- Each commit points to a tree of file entries (a simplified Git tree object).
+- Metadata such as commit message, parent hash, and tree hash are stored in the object store.
+- HEAD points to the latest commit and is stored in `.git/HEAD` and `.git/refs/heads/main`.
+
+### 🔹 Status
+- Compares working directory → index → HEAD.
+- Reports:
+  - Modified files (not staged)
+  - New/deleted/modified files staged for commit
+  - Untracked files
+
+---
+
+## 🗂️ Project Structure
+
+```
+GitDotNetClone/
+├── src/
+│   ├── CLI/                         # Command-line interface (init, add, commit, status)
+│   ├── Core/
+│   │   ├── Index/                   # Index and IndexEntry management
+│   │   ├── Objects/                 # All git objects (e.g., commits and blobs)
+│   │   ├── Services/                # Git object and commit handling
+│   │   └── Stores/                  # I/O abstractions for object/index/HEAD
+│   └── CrossCuttingConcerns/        # Shared helpers like path normalization
+├── test/
+│   └── CLI.Tests/                   # xUnit-based tests for CLI commands
+|   └── Core.Test/                   # xUnit-based tests for Core components
+|   └── CrossCuttingConcerns.Test/   # xUnit-based tests for helpers
+├── README.md
+└── GitDotNetClone.sln
+```
+
+---
+
+
+## 🧪 Testing
+
+- Tests are written using [xUnit](https://xunit.net/).
+- Integration-style tests use real file system paths for realism.
+- Each command (`init`, `add`, `commit`, `status`) is tested independently and in end-to-end workflows.
+
+### 🧾 Run Tests
+
+```bash
+dotnet test
+```
+
+---
+
+## 📎 Requirements
+
+- .NET 9.0 SDK or later
+- Windows/Linux/macOS
+
+---
+
+## 🧑‍💻 Contributing
+
+Want to extend GitDotNetClone? Contributions are welcome!
+- Fork the repository
+- Create a branch (`git checkout -b feature/my-feature`)
+- Commit your changes and push
+- Open a pull request!
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
