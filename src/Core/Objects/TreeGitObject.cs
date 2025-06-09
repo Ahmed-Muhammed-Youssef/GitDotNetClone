@@ -25,5 +25,13 @@
             TreeGitObject treeGitObject = Deserialize<TreeGitObject>();
             TreeEntries = treeGitObject.TreeEntries;
         }
+
+        /// <summary>
+        /// for deserialization purposes only.
+        /// </summary>
+        public TreeGitObject()
+        {
+            _content = [];
+        }
     }
 }

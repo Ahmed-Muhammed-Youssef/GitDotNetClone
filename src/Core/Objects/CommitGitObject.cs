@@ -2,11 +2,11 @@
 {
     public class CommitGitObject : GitObject
     {
-        public string TreeHash { get; }
-        public string? ParentHash { get; }
-        public string Author { get; }
-        public string Committer { get; }
-        public string Message { get; }
+    public string TreeHash { get; init; } = string.Empty;
+    public string? ParentHash { get; init; }
+    public string Author { get; init; } = string.Empty;
+    public string Committer { get; init; } = string.Empty;
+    public string Message { get; init; } = string.Empty;
         public override string Type => "commit";
 
         private readonly byte[] _content = [];
@@ -39,5 +39,11 @@
             Message = deserialized.Message;
         }
 
+    /// <summary>
+    /// for deserialization purposes only.
+    /// </summary>
+    public CommitGitObject()
+    {
+        
     }
 }
